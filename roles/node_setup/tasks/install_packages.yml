@@ -1,0 +1,16 @@
+- name: Install necessary packages
+  ansible.builtin.apt:
+    name:
+      - python3-wheel
+      - iputils-ping
+      - netcat
+      - util-linux
+      - dnsutils
+      - jq
+      - open-iscsi
+
+- name: Enable and start services
+  ansible.builtin.systemd:
+    name: open-iscsi
+    state: started
+    enabled: true

@@ -1,2 +1,4 @@
 ---
-# tasks file for node_setup
+- name: Install the required packages (via apt)
+  import_tasks: install_packages.yml
+  when: ansible_facts['os_family'] | lower == 'debian'
