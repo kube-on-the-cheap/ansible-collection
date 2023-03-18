@@ -1,0 +1,21 @@
+---
+- name: Reset connection prior testing the OCI_CLI_AUTH env var
+  meta: reset_connection
+
+- name: Refresh facts in order to get the newly added variable
+  setup:
+
+- name: Fail if the OCI_CLI_AUTH env var is not set
+  fail:
+    msg: "The OCI_CLI_AUTH var is not set. Check your profile"
+  when: ansible_env.OCI_CLI_AUTH != 'instance_principal'
+
+- name: Issue a test OCI cli command
+  ansible.builtin.shell:
+    cmd: oci os ns get
+  register: test_oci_cli_command
+
+- name: "[DEBUG] Show the output of the test command"
+  ansible.builtin.debug:
+    var: test_oci_cli_command
+    verbosity: 1

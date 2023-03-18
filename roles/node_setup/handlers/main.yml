@@ -1,5 +1,9 @@
 ---
-- name: Apply iptables rules
+- name: Restore iptables rules
   community.general.iptables_state:
     state: restored
     path: /etc/iptables/rules.v4
+
+- name: Check OCI cli
+  ansible.builtin.include_tasks:
+    file: "{{ role_path }}/handlers/oci_cli.yml"
