@@ -2,19 +2,19 @@
 - name: Install necessary packages
   ansible.builtin.apt:
     name:
-      - python3-wheel
-      - iputils-ping
-      - netcat
-      - util-linux
       - dnsutils
+      - iputils-ping
       - jq
+      - netcat
       - open-iscsi
+      - python3-wheel
+      - util-linux
 
-- name: Enable and start services
-  ansible.builtin.systemd:
-    name: open-iscsi
-    state: started
-    enabled: true
+# - name: Enable and start services
+#   ansible.builtin.systemd:
+#     name: open-iscsi
+#     state: started
+#     enabled: true
 
 - name: Install the OCI cli
   ansible.builtin.pip:

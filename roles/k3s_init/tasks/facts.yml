@@ -1,0 +1,24 @@
+---
+- name: Get this instance's OCID
+  ansible.builtin.uri:
+    url: http://169.254.169.254/opc/v2/instance
+    method: GET
+    headers:
+      Authorization: Bearer Oracle
+  register: instance_details
+
+- name: "[DEBUG] Check the instance details"
+  ansible.builtin.debug:
+    var: instance_details
+    verbosity: 1
+
+- name: Fetch facts about this instance
+  oracle.oci.oci_compute_instance_facts:
+    instance_id: "{{ instance_details.json.id }}"
+    auth_type: instance_principal
+  register: oci_compute_facts
+
+- name: "[DEBUG] Print all available OCI facts"
+  ansible.builtin.debug:
+    var: oci_compute_facts
+    verbosity: 1

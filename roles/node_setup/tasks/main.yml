@@ -3,3 +3,33 @@
   become: true
   import_tasks: install_packages.yml
   when: ansible_facts['os_family'] | lower == 'debian'
+
+- name: Configure the needrestart daemon
+  become: true
+  ansible.builtin.lineinfile:
+    search_string: "$nrconf{restart}"
+    line: $nrconf{restart} = 'a';
+    path: /etc/needrestart/needrestart.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+# We need this because every instance comes loaded with an iptables set of rules that block all INPUT and FORWARD connections;
+# this is not a proper way of handling traffic within a Cloud Provider, Oracle.
+#
+# https://blogs.oracle.com/developers/post/enabling-network-traffic-to-ubuntu-images-in-oracle-cloud-infrastructure
+- name: Ensure iptables doesn't block us
+  become: true
+  ansible.builtin.lineinfile:
+    search_string: "-A {{ item }}"
+    state: absent
+    path: /etc/iptables/rules.v4
+    backup: true
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - INPUT
+    - FORWARD
+  notify:
+    - Restore iptables rules

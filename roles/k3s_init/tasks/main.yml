@@ -1,0 +1,3 @@
+---
+- name: Gather facts about this instance
+  import_tasks: facts.yml
