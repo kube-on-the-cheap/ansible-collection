@@ -1,2 +1,2 @@
 ---
-# defaults file for k3s_init
+k3s_kubeconfig_path: /etc/rancher/k3s/config

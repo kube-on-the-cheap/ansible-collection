@@ -1,20 +1,38 @@
 ---
-- name: Get this instance's OCID
+# https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/gettingmetadata.htm
+- name: Get this instance metadata
   ansible.builtin.uri:
-    url: http://169.254.169.254/opc/v2/instance
+    url: "http://169.254.169.254/opc/v2/{{ item }}"
     method: GET
     headers:
       Authorization: Bearer Oracle
-  register: instance_details
+  register: opc_v2_metadata
+  with_items:
+    - instance
+    - vnics
+    # - volumeAttachments
 
 - name: "[DEBUG] Check the instance details"
   ansible.builtin.debug:
-    var: instance_details
+    msg: "{{ opc_v2_metadata.results }}"
     verbosity: 1
+
+- name: Set instance metadata as facts
+  ansible.builtin.set_fact:
+    oracle_metadata_instance: "{{ opc_v2_metadata.results | selectattr('item','equalto','instance') | map(attribute='json') | first }}"
+    oracle_metadata_vnic: "{{ opc_v2_metadata.results | selectattr('item','equalto','vnics') | map(attribute='json') | first }}"
+
+- name: "[DEBUG] Check facts are set"
+  ansible.builtin.debug:
+    var: "{{ item }}"
+    verbosity: 1
+  with_items:
+    - oracle_metadata_instance
+    - oracle_metadata_vnic
 
 - name: Fetch facts about this instance
   oracle.oci.oci_compute_instance_facts:
-    instance_id: "{{ instance_details.json.id }}"
+    instance_id: "{{ oracle_metadata_instance.id }}"
     auth_type: instance_principal
   register: oci_compute_facts
 

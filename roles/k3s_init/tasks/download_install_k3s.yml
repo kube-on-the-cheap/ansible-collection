@@ -1,0 +1,10 @@
+- name: "Fetch metadata for release {{ k3s_version }}"
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/k3s-io/k3s/releases/tags/{{ k3s_version | urlencode }}"
+    return_content: true
+    headers:
+      Accept: application/vnd.github+json
+  register: k3s_release_data
+# - ansible.builtin.get_url:
+#     url: "{{ k3s_release_data.json.assets | selectattr('name', '' }}"
+#     dest: /tmp/k3s-latest.tar.gz
