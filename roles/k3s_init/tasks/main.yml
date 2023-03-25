@@ -3,6 +3,7 @@
   import_tasks: facts.yml
 
 - name: Download and install K3s
+  become: true
   import_tasks: download_install_k3s.yml
 
 - name: Generate the K3s config

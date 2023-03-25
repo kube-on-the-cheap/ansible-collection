@@ -40,3 +40,16 @@
   ansible.builtin.debug:
     var: oci_compute_facts
     verbosity: 1
+
+- name: "Fetch metadata for K3s release {{ k3s_version }}"
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/k3s-io/k3s/releases/tags/{{ k3s_version | urlencode }}"
+    return_content: true
+    headers:
+      Accept: application/vnd.github+json
+  register: k3s_release_data
+
+- name: "[DEBUG] Show the GitHub release data for K3s release {{ k3s_version }}"
+  ansible.builtin.debug:
+    msg: "{{ k3s_release_data.json.assets }}"
+    verbosity: 1

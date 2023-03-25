@@ -1,10 +1,18 @@
-- name: "Fetch metadata for release {{ k3s_version }}"
-  ansible.builtin.uri:
-    url: "https://api.github.com/repos/k3s-io/k3s/releases/tags/{{ k3s_version | urlencode }}"
-    return_content: true
-    headers:
-      Accept: application/vnd.github+json
-  register: k3s_release_data
-# - ansible.builtin.get_url:
-#     url: "{{ k3s_release_data.json.assets | selectattr('name', '' }}"
-#     dest: /tmp/k3s-latest.tar.gz
+- name: Download K3s
+  ansible.builtin.get_url:
+    url: "{{ k3s_release_data.json.assets | selectattr('name', 'match', '^k3s-' + sanitize_arch[lookup('ansible.builtin.vars', 'ansible_machine')] + '$') | map(attribute='browser_download_url') | first }}"
+    dest: /usr/local/bin/k3s
+    mode: "0755"
+    owner: root
+    group: root
+    checksum: "sha256:{{ k3s_release_data.json.assets | selectattr('name', 'match', '^sha256sum-' + sanitize_arch[lookup('ansible.builtin.vars', 'ansible_machine')] + '\\.txt$') | map(attribute='browser_download_url') | first }}"
+
+- name: Setup K3s systemd unit
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/k3s-io/k3s/{{ k3s_version | urlencode }}/k3s.service"
+    dest: /etc/systemd/system/k3s.service
+    mode: "0755"
+    owner: root
+    group: root
+  notify:
+    - Systemd reload
