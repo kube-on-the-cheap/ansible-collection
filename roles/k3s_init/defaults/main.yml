@@ -1,5 +1,5 @@
 ---
-k3s_kubeconfig_path: /etc/rancher/k3s/.kube
+k3s_kubeconfig_path: /etc/rancher/k3s/.kube/
 sanitize_arch:
   aarch64: arm64
   x86_64: amd64

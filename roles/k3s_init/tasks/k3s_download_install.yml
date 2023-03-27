@@ -6,6 +6,8 @@
     owner: root
     group: root
     checksum: "sha256:{{ k3s_release_data.json.assets | selectattr('name', 'match', '^sha256sum-' + sanitize_arch[lookup('ansible.builtin.vars', 'ansible_machine')] + '\\.txt$') | map(attribute='browser_download_url') | first }}"
+  notify:
+    - Verify system setup
 
 - name: Setup K3s systemd unit
   ansible.builtin.get_url:
@@ -16,3 +18,4 @@
     group: root
   notify:
     - Systemd reload
+    - Verify system setup

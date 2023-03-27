@@ -2,16 +2,17 @@ node-ip: {{ oci_compute_facts.instances[0].primary_private_ip }}
 node-external-ip: {{ oci_compute_facts.instances[0].primary_public_ip }}
 token: {{ ansible_facts.hostname | to_uuid }}
 node-label:
-  - "kubernetes.io/arch={{ ansible_facts.architecture }}"
+  - "kubernetes.io/arch={{ sanitize_arch[lookup('ansible.builtin.vars', 'ansible_machine')] }}"
   - "kubernetes.io/hostname={{ ansible_facts.hostname }}"
+  - "node.kubernetes.io/instance-type={{ oracle_metadata_instance.shape | lower }}"
   - "topology.kubernetes.io/region={{ oracle_metadata_instance.canonicalRegionName | lower }}"
   - "topology.kubernetes.io/zone={{ oracle_metadata_instance.ociAdName | lower}}"
   - "failure-domain.beta.kubernetes.io/zone={{ oracle_metadata_instance.faultDomain | lower }}"
   - "cloud.oracle.com/availability-domain={{ oracle_metadata_instance.ociAdName }}"
   - "cloud.oracle.com/fault-domain={{ oracle_metadata_instance.faultDomain | lower }}"
   - "cloud.oracle.com/oci-instance-shape={{ oracle_metadata_instance.shape | lower }}"
-  - "cloud.oracle.com/oci-instancepool-id={{ oracle_metadata_instance.instancePoolId }}"
-  - "cloud.oracle.com/oci-instance-id={{ oracle_metadata_instance.id }}"
+  - "cloud.oracle.com/oci-instancepool-id={{ oracle_metadata_instance.instancePoolId | split('.') | last }}"
+  - "cloud.oracle.com/oci-instance-id={{ oracle_metadata_instance.id | split('.') | last }}"
 kubelet-arg:
   - "cloud-provider=external"
-  - "provider-id={{ oracle_metadata_instance.id }}"
+  - "provider-id={{ oracle_metadata_instance.id | split('.') | last }}"

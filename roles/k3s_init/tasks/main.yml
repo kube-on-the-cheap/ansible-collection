@@ -1,11 +1,20 @@
 ---
 - name: Gather facts about this instance
+  tags:
+    - system
+    - metadata
   import_tasks: facts.yml
 
-- name: Download and install K3s
+- name: "[K3s] Download and install the binary and set up the systemd unit"
+  tags:
+    - k3s
+    - setup
   become: true
-  import_tasks: download_install_k3s.yml
+  import_tasks: k3s_download_install.yml
 
-- name: Generate the K3s config
+- name: "[K3s] Generate the config"
+  tags:
+    - k3s
+    - config
   become: true
-  import_tasks: template.yml
+  import_tasks: k3s_config.yml

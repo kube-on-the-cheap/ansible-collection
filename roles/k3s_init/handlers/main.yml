@@ -4,3 +4,7 @@
   become: true
   ansible.builtin.systemd:
     daemon_reload: true
+
+- name: Verify system setup
+  ansible.builtin.command:
+    cmd: /usr/local/bin/k3s check-config

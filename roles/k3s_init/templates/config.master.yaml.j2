@@ -1,31 +1,15 @@
 agent-token: {{ ansible_facts.hostname | to_uuid }}
-node-label:
-  - "node-role.kubernetes.io/master"
-  - "node-role.kubernetes.io/control-plane"
-{% if oracle_metadata_instance.definedTags["K3s-NodeInfo"].EtcdBackup is defined -%}
-etcd-snapshot-schedule-cron: '0 0 * * *'
-etcd-snapshot-retention: 14
-etcd-s3: "true"
-etcd-s3-endpoint	
-etcd-s3-endpoint-ca	
-etcd-s3-skip-ssl-verify
-etcd-s3-access-key	
-etcd-s3-secret-key	
-etcd-s3-bucket	
-etcd-s3-region	
-etcd-s3-folder
-{%- endif %}
 etcd-expose-metrics: "true"
 flannel-backend: "none"
 disable-cloud-controller: "true"
 write-kubeconfig-mode: "0644"
-write-kubeconfig: {{ k3s_kubeconfig_path }}
+write-kubeconfig: {{ k3s_kubeconfig_path }}/config
 cluster-cidr: {{ k3s_cluster_cidr }}
 service-cidr: {{ k3s_service_cidr }}
 disable-network-policy: "true"
-no-deploy:
+disable:
   - traefik
   - servicelb
-advertise-address: {{ k3s_apiserver_lb_hostname }}
+advertise-address: {{ oci_compute_facts.instances | map(attribute="primary_public_ip") | first }}
 tls-san:
   - "{{ k3s_apiserver_lb_hostname }}"

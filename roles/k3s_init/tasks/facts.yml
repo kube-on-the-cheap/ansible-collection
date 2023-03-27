@@ -52,4 +52,4 @@
 - name: "[DEBUG] Show the GitHub release data for K3s release {{ k3s_version }}"
   ansible.builtin.debug:
     msg: "{{ k3s_release_data.json.assets }}"
-    verbosity: 1
+    verbosity: 2

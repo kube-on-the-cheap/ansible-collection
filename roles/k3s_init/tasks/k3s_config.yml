@@ -3,11 +3,10 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    recurse: yes
     owner: root
     group: root
     mode: "0755"
-  with_items:
+  loop:
     - /etc/rancher/k3s/config.yaml.d/
     - "{{ k3s_kubeconfig_path }}"
 
