@@ -1,0 +1,39 @@
+- name: Enable and start K3s systemd unit
+  ansible.builtin.systemd:
+    state: started
+    name: k3s
+    enabled: true
+
+- name: Check we're bootstrapped
+  block:
+    - name: Wait until the API Server is up and running
+      ansible.builtin.wait_for:
+        port: 6443
+        delay: 10
+
+    - name: Wait until we have a kubeconfig
+      ansible.builtin.wait_for:
+        path: "{{ k3s_kubeconfig }}"
+        state: present
+
+    - name: Run a kubectl command...
+      changed_when: false
+      environment:
+        KUBECONFIG: "{{ k3s_kubeconfig }}"
+      ansible.builtin.shell: k3s kubectl get nodes --output json
+      register: k3s_kubectl
+
+    - name: "[DEBUG] Show the kubectl output"
+      ansible.builtin.debug:
+        msg: "{{ k3s_kubectl.stdout | ansible.builtin.from_json }}"
+        verbosity: 2
+
+    - name: ...and verify the we have our master node
+      ansible.builtin.assert:
+        that:
+          - "(k3s_kubectl.stdout | ansible.builtin.from_json)['items'] |  map(attribute='metadata') | map(attribute='name') | first == ansible_facts.hostname"
+        fail_msg: "'kubectl get nodes' doesn't contain the node hostname"
+        success_msg: "'kubectl get nodes' contains the node hostname"
+# wait_for
+# get config
+# push it to object storage

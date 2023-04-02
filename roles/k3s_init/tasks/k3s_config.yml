@@ -8,7 +8,7 @@
     mode: "0755"
   loop:
     - /etc/rancher/k3s/config.yaml.d/
-    - "{{ k3s_kubeconfig_path }}"
+    - "{{ k3s_kubeconfig | ansible.builtin.dirname }}"
 
 # Agent config options: https://rancher.com/docs/k3s/latest/en/installation/install-options/agent-config/
 - name: Template the shared K3s config
@@ -24,8 +24,8 @@
 # Agent server options: https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/
 - name: Template the master K3s config
   ansible.builtin.template:
-    src: templates/config.master.yaml.j2
-    dest: /etc/rancher/k3s/config.yaml.d/master.yaml
+    src: templates/config.master.ansible.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml.d/master.ansible.yaml
     backup: true
     force: true
     owner: root

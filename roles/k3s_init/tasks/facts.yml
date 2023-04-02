@@ -30,15 +30,20 @@
     - oracle_metadata_instance
     - oracle_metadata_vnic
 
-- name: Fetch facts about this instance
+- name: Fetch compute facts about this instance
   oracle.oci.oci_compute_instance_facts:
     instance_id: "{{ oracle_metadata_instance.id }}"
     auth_type: instance_principal
   register: oci_compute_facts
 
+- name: Fetch object storage namespace facts
+  oracle.oci.oci_object_storage_namespace_facts:
+    auth_type: instance_principal
+  register: oci_object_storage_facts
+
 - name: "[DEBUG] Print all available OCI facts"
   ansible.builtin.debug:
-    var: oci_compute_facts
+    msg: "{{ oci_compute_facts | ansible.builtin.combine(oci_object_storage_facts) }}"
     verbosity: 1
 
 - name: "Fetch metadata for K3s release {{ k3s_version }}"
@@ -52,4 +57,18 @@
 - name: "[DEBUG] Show the GitHub release data for K3s release {{ k3s_version }}"
   ansible.builtin.debug:
     msg: "{{ k3s_release_data.json.assets }}"
+    verbosity: 2
+
+- name: Get the certificate for the Object Storage namespace endpoint
+  community.crypto.get_certificate:
+    host: "{{ item }}"
+    port: 443
+  run_once: true
+  register: oci_object_storage_cert
+  loop:
+    - "{{ oci_object_storage_facts.namespace }}.compat.objectstorage.{{ oracle_metadata_instance.region }}.oraclecloud.com"
+
+- name: "[DEBUG] Show the certificate for the Object Storage namespace endpoint"
+  ansible.builtin.debug:
+    msg: "{{ oci_object_storage_cert }}"
     verbosity: 2

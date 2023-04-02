@@ -1,6 +1,5 @@
 node-ip: {{ oci_compute_facts.instances[0].primary_private_ip }}
 node-external-ip: {{ oci_compute_facts.instances[0].primary_public_ip }}
-token: {{ ansible_facts.hostname | to_uuid }}
 node-label:
   - "kubernetes.io/arch={{ sanitize_arch[lookup('ansible.builtin.vars', 'ansible_machine')] }}"
   - "kubernetes.io/hostname={{ ansible_facts.hostname }}"
