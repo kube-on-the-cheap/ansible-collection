@@ -1,10 +1,4 @@
 ---
-- name: Gather facts about this instance
-  tags:
-    - system
-    - metadata
-  import_tasks: facts.yml
-
 - name: "[K3s] Download and install the binary and set up the systemd unit"
   tags:
     - k3s

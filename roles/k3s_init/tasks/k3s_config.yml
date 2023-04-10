@@ -10,7 +10,7 @@
     - /etc/rancher/k3s/config.yaml.d/
     - "{{ k3s_kubeconfig | ansible.builtin.dirname }}"
 
-# Agent config options: https://rancher.com/docs/k3s/latest/en/installation/install-options/agent-config/
+# Agent config options: https://docs.k3s.io/cli/agent
 - name: Template the shared K3s config
   ansible.builtin.template:
     src: templates/config.common.yaml.j2
