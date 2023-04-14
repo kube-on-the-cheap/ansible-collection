@@ -1,9 +1,9 @@
 ---
-- hosts: master
+- hosts: all
   force_handlers: True
   collections:
     - kube_on_the_cheap.oci_k3s
   roles:
     - node_setup
     - node_facts
-    - k3s_init
+    - k3s_setup

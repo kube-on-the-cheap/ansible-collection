@@ -1,0 +1,7 @@
+---
+- name: "[K3s] Bootstrap the cluster"
+  tags:
+    - k3s
+    - bootstrap
+  become: true
+  import_tasks: k3s_bootstrap.yml

@@ -1,0 +1,32 @@
+---
+- name: "[K3s] Download and install the binary and set up the systemd unit"
+  tags:
+    - k3s
+    - setup
+  become: true
+  import_tasks: k3s_download_install.yml
+
+- name: "[K3s] Generate the common config"
+  tags:
+    - k3s
+    - config
+  become: true
+  import_tasks: k3s_config.yml
+
+- name: "[K3s] Generate the masters config"
+  tags:
+    - k3s
+    - config
+    - masters
+  become: true
+  import_tasks: k3s_config_masters.yml
+  when: oracle_metadata_instance.definedTags["K3s-NodeInfo"].NodeRole == "master"
+
+- name: "[K3s] Generate the workers config"
+  tags:
+    - k3s
+    - config
+    - workers
+  become: true
+  import_tasks: k3s_config_workers.yml
+  when: oracle_metadata_instance.definedTags["K3s-NodeInfo"].NodeRole == "worker"

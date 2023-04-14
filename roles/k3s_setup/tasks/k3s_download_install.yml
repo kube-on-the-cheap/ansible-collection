@@ -22,7 +22,7 @@
   notify:
     - Verify system setup
 
-- name: Setup K3s systemd unit
+- name: Download K3s systemd unit
   ansible.builtin.get_url:
     url: "https://raw.githubusercontent.com/k3s-io/k3s/{{ k3s_version | urlencode }}/k3s.service"
     dest: /etc/systemd/system/k3s.service

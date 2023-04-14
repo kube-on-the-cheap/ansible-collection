@@ -47,6 +47,19 @@
   ansible.builtin.debug:
     msg: "{{ oci_compute_facts | ansible.builtin.combine(oci_object_storage_facts) }}"
     verbosity: 1
+
+- name: Fetch any assigned secrets' value
+  oracle.oci.oci_secrets_secret_bundle_facts:
+    auth_type: instance_principal
+    secret_id: "{{ item.id }}"
+  loop: '{{ oracle_metadata_instance.definedTags["K3s-ClusterSecrets"] | dict2items(key_name="secret", value_name="id") }}'
+  register: k3s_clustersecrets
+
+- name: "[DEBUG] Print the secrets variable"
+  no_log: True
+  ansible.builtin.debug:
+    msg: "{{ k3s_clustersecrets }}"
+    verbosity: 2
 # - name: Get the certificate for the Object Storage namespace endpoint
 #   community.crypto.get_certificate:
 #     host: "{{ item }}"
