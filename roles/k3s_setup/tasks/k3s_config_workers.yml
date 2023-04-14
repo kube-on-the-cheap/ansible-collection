@@ -1,0 +1,23 @@
+---
+- name: Change K3s systemd unit to run as agent
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/k3s.service
+    regexp: "^ExecStart=.*$"
+    line: "ExecStart=/usr/local/bin/k3s agent"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Systemd reload
+    - Verify system setup
+
+# Agent config options: https://docs.k3s.io/cli/agent
+- name: Template the worker K3s config
+  ansible.builtin.template:
+    src: templates/config.worker.ansible.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml.d/worker.ansible.yaml
+    backup: true
+    force: true
+    owner: root
+    group: root
+    mode: "0600"

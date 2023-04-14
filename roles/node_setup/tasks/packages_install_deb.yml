@@ -1,0 +1,11 @@
+---
+- name: Install necessary packages
+  ansible.builtin.apt:
+    name:
+      - dnsutils
+      - iputils-ping
+      - jq
+      - netcat
+      - open-iscsi
+      - python3-wheel
+      - util-linux

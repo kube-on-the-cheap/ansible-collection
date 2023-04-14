@@ -1,0 +1,6 @@
+---
+- name: Gather facts about this instance
+  tags:
+    - system
+    - metadata
+  import_tasks: facts.yml

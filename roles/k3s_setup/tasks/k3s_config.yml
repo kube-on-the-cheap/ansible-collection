@@ -1,0 +1,21 @@
+---
+- name: Create the directories to host config and output
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - /etc/rancher/k3s/config.yaml.d/
+    - "{{ k3s_kubeconfig | ansible.builtin.dirname }}"
+
+- name: Template the shared K3s config
+  ansible.builtin.template:
+    src: templates/config.common.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml.d/common.yaml
+    backup: true
+    force: true
+    owner: root
+    group: root
+    mode: "0600"
