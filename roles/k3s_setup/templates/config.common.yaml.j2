@@ -15,6 +15,3 @@ node-label:
 kubelet-arg:
   - "cloud-provider=external"
   - "provider-id={{ oracle_metadata_instance.id | split('.') | last }}"
-{% for result in k3s_clustersecrets.results %}
-{{ result.item.secret }}: {{ result.secret_bundle.secret_bundle_content.content | b64decode }}
-{% endfor %}

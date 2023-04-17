@@ -18,3 +18,6 @@ etcd-s3-endpoint-ca: "b64ca"
 etcd-s3-skip-ssl-verify: true
 etcd-s3-region: "{{ oracle_metadata_instance.canonicalRegionName | lower }}"
 etcd-s3-folder: "etcd"
+{% for result in k3s_clustersecrets.results %}
+{{ result.item.secret }}: {{ result.secret_bundle.secret_bundle_content.content | b64decode }}
+{% endfor %}
