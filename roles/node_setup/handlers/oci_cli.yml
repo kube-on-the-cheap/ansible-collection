@@ -1,6 +1,6 @@
 ---
 - name: Reset SSH connection prior testing the OCI_CLI_AUTH env var
-  ansible.builtin.meta reset_connection:
+  ansible.builtin.meta: reset_connection
 
 - name: Refresh facts in order to get the newly added variable
   ansible.builtin.setup:
