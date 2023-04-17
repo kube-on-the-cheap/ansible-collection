@@ -1,19 +1,24 @@
 ---
-- name: Reset SSH connection prior testing the OCI_CLI_AUTH env var
-  ansible.builtin.meta: reset_connection
+# Only via SSH because we can terminate and restart the connection; no such thing is doable on a local exec
+- name: When using SSH, ensure the OCI_CLI_AUTH variable is present
+  when: ansible_connection != "local"
+  block:
+    - name: Reset SSH connection prior testing the OCI_CLI_AUTH env var
+      ansible.builtin.meta: reset_connection
 
-- name: Refresh facts in order to get the newly added variable
-  ansible.builtin.setup:
+    - name: Refresh facts in order to get the newly added variable
+      ansible.builtin.setup:
 
-- name: Fail if the OCI_CLI_AUTH env var is not set
-  ansible.builtin.fail:
-    msg: "The OCI_CLI_AUTH var is not set. Check your profile"
-  when: ansible_env.OCI_CLI_AUTH != 'instance_principal'
+    - name: Fail if the OCI_CLI_AUTH env var is not set
+      ansible.builtin.fail:
+        msg: "The OCI_CLI_AUTH var is not set. Check your profile"
+      when: ansible_env.OCI_CLI_AUTH != 'instance_principal'
 
+# As stated above: if this is a local execution, set the env var for this command only
 - name: Issue a test OCI cli command
   changed_when: false
-  ansible.builtin.command:
-    cmd: oci os ns get
+  ansible.builtin.shell:
+    cmd: "{% if ansible_connection == 'local' -%} OCI_CLI_AUTH=instance_principal {%- endif %} oci os ns get"
   register: test_oci_cli_command
 
 - name: "[DEBUG] Show the output of the test command"
