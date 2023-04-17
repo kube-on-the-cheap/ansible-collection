@@ -3,4 +3,4 @@
   tags:
     - system
     - metadata
-  import_tasks: facts.yml
+  ansible.builtin.import_tasks: facts.yml

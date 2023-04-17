@@ -1,3 +1,4 @@
+# Also set in the cloud-init config (it must be present before the init script)
 - name: Configure the OCI cli to use 'instance_principal' authentication
   ansible.builtin.lineinfile:
     path: /etc/environment

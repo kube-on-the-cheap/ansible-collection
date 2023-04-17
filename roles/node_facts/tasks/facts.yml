@@ -19,8 +19,8 @@
 
 - name: Set instance metadata as facts
   ansible.builtin.set_fact:
-    oracle_metadata_instance: "{{ opc_v2_metadata.results | selectattr('item','equalto','instance') | map(attribute='json') | first }}"
-    oracle_metadata_vnic: "{{ opc_v2_metadata.results | selectattr('item','equalto','vnics') | map(attribute='json') | first }}"
+    oracle_metadata_instance: "{{ opc_v2_metadata.results | selectattr('item', 'equalto', 'instance') | map(attribute='json') | first }}"
+    oracle_metadata_vnic: "{{ opc_v2_metadata.results | selectattr('item', 'equalto', 'vnics') | map(attribute='json') | first }}"
 
 - name: "[DEBUG] Check metadata facts are set"
   ansible.builtin.debug:
@@ -56,7 +56,7 @@
   register: k3s_clustersecrets
 
 - name: "[DEBUG] Print the secrets variable"
-  no_log: True
+  no_log: true
   ansible.builtin.debug:
     msg: "{{ k3s_clustersecrets }}"
     verbosity: 2
