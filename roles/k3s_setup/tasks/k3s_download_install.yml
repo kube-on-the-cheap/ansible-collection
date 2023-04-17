@@ -13,16 +13,14 @@
 
 - name: Download K3s
   ansible.builtin.get_url:
-    url: |
-      "{{ k3s_release_data.json.assets
+    url: "{{ k3s_release_data.json.assets
       | selectattr('name', 'match', '^k3s-' + sanitize_arch[lookup('ansible.builtin.vars', 'ansible_machine')] + '$')
       | map(attribute='browser_download_url') | first }}"
     dest: /usr/local/bin/k3s
     mode: "0755"
     owner: root
     group: root
-    checksum: |
-      "sha256:{{ k3s_release_data.json.assets
+    checksum: "sha256:{{ k3s_release_data.json.assets
       | selectattr('name', 'match', '^sha256sum-' + sanitize_arch[lookup('ansible.builtin.vars', 'ansible_machine')] + '\\.txt$')
       | map(attribute='browser_download_url') | first }}"
   notify:
