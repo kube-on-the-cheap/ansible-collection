@@ -8,7 +8,7 @@ namespace: kube_on_the_cheap
 name: oci_k3s
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.0.1
+version: 1.0.2
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -53,7 +53,7 @@ repository: https://github.com/kube-on-the-cheap/ansible-collection-oci-k3s/
 documentation: http://docs.example.com
 
 # The URL to the homepage of the collection/project
-homepage: http://example.com
+# homepage: http://example.com
 
 # The URL to the collection issue tracker
 issues: https://github.com/kube-on-the-cheap/ansible-collection-oci-k3s/issues
@@ -69,4 +69,3 @@ build_ignore: []
 # 'omit_default_directives' is a boolean that controls whether the default directives are used. Mutually exclusive
 # with 'build_ignore'
 # manifest: null
-

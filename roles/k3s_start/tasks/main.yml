@@ -1,0 +1,8 @@
+---
+- name: "[K3s] [MASTER] Start the server or join an existing cluster"
+  tags:
+    - k3s
+    - bootstrap
+  become: true
+  ansible.builtin.import_tasks: k3s_start_join_masters.yml
+  when: oracle_metadata_instance.definedTags["K3s-NodeInfo"].NodeRole == "master"

@@ -31,7 +31,7 @@
     - name: ...and verify the we have our master node
       ansible.builtin.assert:
         that:
-          - "(k3s_kubectl.stdout | ansible.builtin.from_json)['items'] |  map(attribute='metadata') | map(attribute='name') | first == ansible_facts.hostname"
+          - "ansible_facts.hostname in (k3s_kubectl.stdout | ansible.builtin.from_json)['items'] |  map(attribute='metadata') | map(attribute='name')"
         fail_msg: "'kubectl get nodes' doesn't contain the node hostname"
         success_msg: "'kubectl get nodes' contains the node hostname"
 # wait_for

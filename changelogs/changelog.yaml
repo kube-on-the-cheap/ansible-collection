@@ -1,0 +1,13 @@
+ancestor: null
+releases:
+  1.0.1:
+    changes:
+      release_summary:
+        "This is the first proper release of the ``kube_on_the_cheap.oci_k3s``
+        collection on 2023-02-14.
+
+        The changelog describes all changes made to the modules and plugins included
+        in this collection."
+    fragments:
+      - 1.0.1.yml
+    release_date: "2023-04-17"

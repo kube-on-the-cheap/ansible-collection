@@ -4,7 +4,7 @@
   tags:
     - system
     - install
-  import_tasks: packages_install_deb.yml
+  ansible.builtin.import_tasks: packages_install_deb.yml
   when: ansible_facts['os_family'] | lower == 'debian'
 
 - name: Install additional distro-independent packages
@@ -12,11 +12,11 @@
   tags:
     - system
     - install
-  import_tasks: packages_install.yml
+  ansible.builtin.import_tasks: packages_install.yml
 
 - name: Configure packages
   become: true
   tags:
     - system
     - config
-  import_tasks: packages_config.yml
+  ansible.builtin.import_tasks: packages_config.yml
