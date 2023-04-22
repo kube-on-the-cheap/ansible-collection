@@ -16,8 +16,18 @@
   ansible.builtin.template:
     src: templates/config.worker.ansible.yaml.j2
     dest: /etc/rancher/k3s/config.yaml.d/worker.ansible.yaml
-    backup: true
     force: true
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Change "agent-token" in "token"
+  ansible.builtin.lineinfile:
+    path: /etc/rancher/k3s/config.yaml.d/worker.ansible.yaml
+    regexp: "^agent-token: (.*)$"
+    line: 'token: \1'
+    backrefs: true
+    backup: false
     owner: root
     group: root
     mode: "0600"

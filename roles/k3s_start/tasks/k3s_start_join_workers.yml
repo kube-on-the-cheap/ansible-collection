@@ -1,0 +1,6 @@
+- name: Enable and start K3s systemd unit
+  ansible.builtin.systemd:
+    state: started
+    name: k3s
+    enabled: true
+# TODO: check the worker effectively joined the cluster
