@@ -31,3 +31,8 @@ repos:
     rev: v6.14.6
     hooks:
       - id: ansible-lint
+  - repo: https://github.com/python-jsonschema/check-jsonschema.git
+    rev: 0.22.0
+    hooks:
+      - id: check-github-actions
+      - id: check-github-workflows
