@@ -1,0 +1,35 @@
+name: semantic checks
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - ".github/**"
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+    paths-ignore:
+      - ".github/**"
+jobs:
+  verify-collection-version-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo, all branches, all commits
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      # - name: Get changed files
+      #   uses: tj-actions/changed-files@v35.9.0
+      #   with:
+      #     files: |
+      #       galaxy.yml
+      - name: Fetch current collection version
+        id: current-collection-version
+        uses: mikefarah/yq@v4.33.3
+        with:
+          cmd: yq '.version' 'galaxy.yml'
