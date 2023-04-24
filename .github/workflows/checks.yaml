@@ -20,8 +20,10 @@ jobs:
           python-version: "3.11"
       - name: Get changed files
         uses: tj-actions/changed-files@v35.9.0
-      - name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed"
-          done
+        with:
+          files_separator: " "
+      - name: Run pre-commit on the changed files
+        uses: pre-commit/action@v3.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          extra_args: --files ${{ steps.changed-files.outputs.all_changed_and_modified_files }}
