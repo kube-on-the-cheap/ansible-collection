@@ -1,4 +1,4 @@
-name: syntax checks
+name: Syntax checks
 on:
   push:
     branches:
