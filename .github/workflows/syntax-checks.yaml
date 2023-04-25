@@ -1,0 +1,56 @@
+name: Syntax checks
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo, all branches, all commits
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35.9.0
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Run pre-commit on the changed files
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --files ${{ steps.changed-files.outputs.all_changed_files }}
+  links-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo, all branches, all commits
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get changed markdown files
+        id: changed-markdown-files
+        uses: tj-actions/changed-files@v35.9.0
+        with:
+          files: |
+            **/*.mdown
+            **/*.md
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v1.7.0
+        if: steps.changed-markdown-files.outputs.any_changed == 'true'
+        with:
+          fail: true
+          args: --no-progress ${{ steps.changed-markdown-files.outputs.all_changed_files }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
