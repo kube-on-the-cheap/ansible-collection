@@ -8,7 +8,7 @@ namespace: kube_on_the_cheap
 name: oci_k3s
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.0.2
+version: 1.0.0
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -29,7 +29,7 @@ description: A collection of Ansible resources to provision a k3s cluster in OCI
 
 # The path to the license file for the collection. This path is relative to the root of the collection. This key is
 # mutually exclusive with 'license'
-license_file: "LICENSE"
+license_file: LICENSE
 
 # A list of tags you want to associate with the collection for indexing/searching. A tag name has the same character
 # requirements as 'namespace' and 'name'
