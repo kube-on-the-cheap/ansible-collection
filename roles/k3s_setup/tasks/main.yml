@@ -6,6 +6,14 @@
   become: true
   ansible.builtin.import_tasks: k3s_download_install.yml
 
+- name: "[META] [MASTER] Set the NodeInitStatus as configuring"
+  oracle.oci.oci_compute_instance:
+    instance_id: "{{ oracle_metadata_instance.id }}"
+    auth_type: instance_principal
+    defined_tags:
+      K3s-NodeInfo:
+        NodeInitStatus: configuring
+
 - name: "[K3s] Generate the common config"
   tags:
     - k3s

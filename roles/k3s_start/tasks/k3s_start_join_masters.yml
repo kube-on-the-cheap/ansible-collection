@@ -34,6 +34,35 @@
           - "ansible_facts.hostname in (k3s_kubectl.stdout | ansible.builtin.from_json)['items'] |  map(attribute='metadata') | map(attribute='name')"
         fail_msg: "'kubectl get nodes' doesn't contain the node hostname"
         success_msg: "'kubectl get nodes' contains the node hostname"
-# wait_for
-# get config
-# push it to object storage
+  rescue:
+    - name: "[META] [MASTER] Set the NodeInitStatus as failed"
+      oracle.oci.oci_compute_instance:
+        instance_id: "{{ oracle_metadata_instance.id }}"
+        auth_type: instance_principal
+        defined_tags:
+          K3s-NodeInfo:
+            NodeInitStatus: failed
+
+- name: Upload the updated kubeconfig to the Config Bucket
+  block:
+    - name: Copy kubeconfig to the parsed one
+      ansible.builtin.copy:
+        dest: "{{ k3s_kubeconfig }}-global"
+        src: "{{ k3s_kubeconfig }}"
+        mode: "0644"
+        remote_src: true
+
+    - name: Edit the config
+      ansible.builtin.replace:
+        path: "{{ k3s_kubeconfig }}-global"
+        regexp: '(127\.0\.0\.1)'
+        replace: '{{ apiserver_lb_hostname }}'
+
+    - name: Upload the complete config
+      oracle.oci.oci_object_storage_object:
+        namespace_name: "{{ oci_object_storage_facts.namespace }}"
+        bucket_name: "{{ k3s_bucket_kubeconfig }}"
+        object_name: kubeconfig
+        src: "{{ k3s_kubeconfig }}-global"
+        force: true
+        auth_type: instance_principal
