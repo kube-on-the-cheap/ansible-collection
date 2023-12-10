@@ -18,8 +18,8 @@ jobs:
   fetch-tag-info:
     runs-on: ubuntu-latest
     outputs:
-      next_tag: steps.next_collection_version.outputs.new_tag
-      configured_tag: steps.configured_collection_version.outputs.result
+      next_tag: ${{ steps.next_collection_version.outputs.new_tag }}
+      configured_tag: ${{ steps.configured_collection_version.outputs.result }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3
@@ -41,9 +41,12 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v3
       - name: Check there's no collisions on next tag
+        env:
+          TAG_NEXT: ${{ needs.fetch-tag-info.outputs.next_tag }}
         run: |
           git fetch --all --tags >/dev/null 2>&1
-          if [ $(git tag --list "${{ needs.fetch-tag-info.outputs.next_tag }}" ) ]; then
+          if [ $(git tag --list $TAG_NEXT ) ]; then
+            echo "::warning ::Next tag value $TAG_NEXT"
             echo "::error ::Next tag already exists in git"
             exit 1
           else
@@ -57,12 +60,16 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v3
       - name: Check that next tag is configured in the Ansible Collection
+        env:
+          TAG_NEXT: ${{ needs.fetch-tag-info.outputs.next_tag }}
+          TAG_CONFIGURED: ${{ needs.fetch-tag-info.outputs.configured_tag }}
         run: |
-          git fetch --all --tags >/dev/null 2>&1
-          if [ "${{ needs.fetch-tag-info.outputs.configured_tag }}" == "${{ needs.fetch-tag-info.outputs.next_tag }}" ]; then
+          if [ "$TAG_NEXT" == "v$TAG_CONFIGURED" ]; then
             echo "::notice ::Next tag is configured in the Ansible Collection"
             exit 0
           else
+            echo "::warning ::Configured tag value is $TAG_CONFIGURED"
+            echo "::warning ::Next tag value is $TAG_NEXT"
             echo "::error ::Next tag is not configured in the Ansible Collection"
             exit 1
           fi
