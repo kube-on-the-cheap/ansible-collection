@@ -5,7 +5,15 @@ Kube_On_The_Cheap.OCI_K3S Release Notes
 .. contents:: Topics
 
 
-v1.0.1
+v0.1.0
+======
+
+Release Summary
+---------------
+
+Two small additions in a while: use a defined tag to flag the progress of the node, and put the generated kubeconfig to a bucket after completion.
+
+v0.0.1
 ======
 
 Release Summary
