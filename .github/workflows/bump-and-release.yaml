@@ -14,9 +14,9 @@ jobs:
   bump-version:
     runs-on: ubuntu-latest
     outputs:
-      new_tag: steps.generate_tag.outputs.new_tag
+      new_tag: ${{ steps.generate_tag.outputs.new_tag }}
       # TODO: Use the changelog from Ansible Collection
-      changelog: steps.generate_tag.outputs.changelog
+      changelog: ${{ steps.generate_tag.outputs.changelog }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3
