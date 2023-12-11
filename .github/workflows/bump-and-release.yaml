@@ -15,8 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_tag: ${{ steps.generate_tag.outputs.new_tag }}
-      # TODO: Use the changelog from Ansible Collection
-      changelog: ${{ steps.generate_tag.outputs.changelog }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3
@@ -35,5 +33,5 @@ jobs:
         uses: ncipollo/release-action@v1.12.0
         with:
           tag: ${{ needs.bump-version.outputs.new_tag }}
-          name: Release ${{ needs.bump-version.outputs.new_tag }}
-          body: ${{ needs.bump-version.outputs.changelog }}
+          generateReleaseNotes: true
+          skipIfReleaseExists: true
