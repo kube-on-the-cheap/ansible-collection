@@ -39,9 +39,9 @@
       oracle.oci.oci_compute_instance:
         instance_id: "{{ oracle_metadata_instance.id }}"
         auth_type: instance_principal
-        defined_tags:
-          K3s-NodeInfo:
-            NodeInitStatus: failed
+        defined_tags: "{{ oracle_metadata_instance.definedTags | ansible.builtin.combine({'K3s-NodeInfo': {'NodeInitStatus': 'failed'}}, recursive=true) }}"
+        # WARN: Please please please leave this, otherwise this will try to poll a work_request with a lot more permissions needed
+        wait: false
 
 - name: Upload the updated kubeconfig to the Config Bucket
   block:

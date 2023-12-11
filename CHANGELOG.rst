@@ -5,6 +5,14 @@ Kube_On_The_Cheap.OCI_K3S Release Notes
 .. contents:: Topics
 
 
+v0.1.3
+======
+
+Release Summary
+---------------
+
+Various fixes: role invocation order, keep spacing in commands, correct tag update process without work_request usage.
+
 v0.1.0
 ======
 
