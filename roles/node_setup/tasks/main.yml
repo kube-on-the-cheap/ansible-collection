@@ -1,12 +1,4 @@
 ---
-- name: "[META] Set the NodeInitStatus as starting"
-  oracle.oci.oci_compute_instance:
-    instance_id: "{{ oracle_metadata_instance.id }}"
-    auth_type: instance_principal
-    defined_tags:
-      K3s-NodeInfo:
-        NodeInitStatus: starting
-
 - name: Install the required packages (via apt)
   become: true
   tags:
