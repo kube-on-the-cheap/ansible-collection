@@ -1,5 +1,10 @@
 ancestor: null
 releases:
+  0.1.3:
+    changes:
+      release_summary:
+        "Various fixes: role invocation order, keep spacing in commands, correct tag update process without work_request usage."
+      release_date: "2023-12-11"
   0.1.0:
     changes:
       release_summary:

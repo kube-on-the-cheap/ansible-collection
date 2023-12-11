@@ -18,7 +18,7 @@
 - name: Issue a test OCI cli command
   changed_when: false
   ansible.builtin.shell:
-    cmd: "{% if ansible_connection == 'local' %}OCI_CLI_AUTH=instance_principal{% endif -%} oci os ns get"
+    cmd: "{% if ansible_connection == 'local' %}OCI_CLI_AUTH=instance_principal{% endif %} oci os ns get"
   register: test_oci_cli_command
 
 - name: "[DEBUG] Show the output of the test command"
