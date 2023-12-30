@@ -1,0 +1,22 @@
+---
+- name: Install the required packages (via apt)
+  become: true
+  tags:
+    - system
+    - install
+  ansible.builtin.import_tasks: packages_install_deb.yml
+  when: ansible_facts['os_family'] | lower == 'debian'
+
+- name: Install additional distro-independent packages
+  become: true
+  tags:
+    - system
+    - install
+  ansible.builtin.import_tasks: packages_install.yml
+
+- name: Configure packages
+  become: true
+  tags:
+    - system
+    - config
+  ansible.builtin.import_tasks: packages_config.yml

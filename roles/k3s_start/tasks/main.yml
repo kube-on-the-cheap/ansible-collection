@@ -1,0 +1,37 @@
+---
+- name: "[META] [MASTER] Set the NodeInitStatus as joining"
+  tags:
+    - metadata
+  oracle.oci.oci_compute_instance:
+    instance_id: "{{ oracle_metadata_instance.id }}"
+    auth_type: instance_principal
+    defined_tags: "{{ oracle_metadata_instance.definedTags | ansible.builtin.combine({ 'K3s-NodeInfo': { 'NodeInitStatus': 'joining' } }, recursive=true) }}"
+    wait: false
+
+- name: "[K3s] [MASTER] Start the server, and form a cluster or join an existing control plane"
+  tags:
+    - k3s
+    - master
+    - bootstrap
+  become: true
+  ansible.builtin.import_tasks: k3s_start_join_masters.yml
+  when: oracle_metadata_instance.definedTags["K3s-NodeInfo"].NodeRole == "master"
+
+- name: "[K3s] [WORKER] Start the wortker and join an existing cluster"
+  tags:
+    - k3s
+    - worker
+    - join
+  become: true
+  ansible.builtin.import_tasks: k3s_start_join_workers.yml
+  when: oracle_metadata_instance.definedTags["K3s-NodeInfo"].NodeRole == "worker"
+
+- name: "[META] [MASTER] Set the NodeInitStatus as succeeded"
+  tags:
+    - metadata
+  oracle.oci.oci_compute_instance:
+    instance_id: "{{ oracle_metadata_instance.id }}"
+    auth_type: instance_principal
+    defined_tags: "{{ oracle_metadata_instance.definedTags | ansible.builtin.combine({ 'K3s-NodeInfo': { 'NodeInitStatus': 'succeeded' } }, recursive=true) }}"
+    # WARN: Please please please leave this, otherwise this will try to poll a work_request with a lot more permissions needed
+    wait: false

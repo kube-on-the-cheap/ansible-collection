@@ -1,0 +1,13 @@
+---
+# Feeling daring, aren't we?
+- name: Restore iptables rules
+  become: true
+  poll: 0
+  async: 5
+  community.general.iptables_state:
+    state: restored
+    path: /etc/iptables/rules.v4
+
+- name: Check OCI cli
+  ansible.builtin.include_tasks:
+    file: "{{ role_path }}/handlers/oci_cli.yml"

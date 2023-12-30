@@ -1,0 +1,4 @@
+playbooks/k3s.yml fqcn[keyword] # Adding the "collection" here to improve readability since all roles come from a single collection
+roles/k3s_start/tasks/k3s_start_join_masters.yml command-instead-of-shell # We need setting an env variable for KUBECONFIG
+roles/node_setup/handlers/oci_cli.yml command-instead-of-shell # We need setting an env variable for testing OCI_CLI_AUTH
+galaxy.yml galaxy[version-incorrect] # I decide when we're good for 1.0

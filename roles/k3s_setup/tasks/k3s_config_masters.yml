@@ -1,0 +1,11 @@
+---
+# Server options: https://docs.k3s.io/cli/server
+- name: Template the master K3s config
+  ansible.builtin.template:
+    src: templates/config.master.ansible.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml.d/master.ansible.yaml
+    backup: true
+    force: true
+    owner: root
+    group: root
+    mode: "0600"

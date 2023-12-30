@@ -1,0 +1,6 @@
+---
+- name: Install the OCI cli
+  ansible.builtin.pip:
+    name: oci-cli
+  notify:
+    - Check OCI cli

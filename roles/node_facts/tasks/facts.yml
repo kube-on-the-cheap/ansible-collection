@@ -1,0 +1,75 @@
+---
+# Instance Metadata as described here: https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/gettingmetadata.htm
+- name: Get this instance metadata
+  ansible.builtin.uri:
+    url: "http://169.254.169.254/opc/v2/{{ item }}"
+    method: GET
+    headers:
+      Authorization: Bearer Oracle
+  register: opc_v2_metadata
+  with_items:
+    - instance
+    - vnics
+    # - volumeAttachments
+
+- name: "[DEBUG] Check the instance details"
+  ansible.builtin.debug:
+    msg: "{{ opc_v2_metadata.results }}"
+    verbosity: 1
+
+- name: Set instance metadata as facts
+  ansible.builtin.set_fact:
+    oracle_metadata_instance: "{{ opc_v2_metadata.results | selectattr('item', 'equalto', 'instance') | map(attribute='json') | first }}"
+    oracle_metadata_vnic: "{{ opc_v2_metadata.results | selectattr('item', 'equalto', 'vnics') | map(attribute='json') | first }}"
+
+- name: "[DEBUG] Check metadata facts are set"
+  ansible.builtin.debug:
+    var: "{{ item }}"
+    verbosity: 1
+  with_items:
+    - oracle_metadata_instance
+    - oracle_metadata_vnic
+
+# Used to get the Public IP of an instance
+- name: Fetch compute facts about this instance
+  oracle.oci.oci_compute_instance_facts:
+    instance_id: "{{ oracle_metadata_instance.id }}"
+    auth_type: instance_principal
+  register: oci_compute_facts
+
+# Used to get the generated namespace name for our tenancy for Object Storage S3 access
+- name: Fetch object storage namespace facts
+  oracle.oci.oci_object_storage_namespace_facts:
+    auth_type: instance_principal
+  register: oci_object_storage_facts
+
+- name: "[DEBUG] Print all available OCI facts"
+  ansible.builtin.debug:
+    msg: "{{ oci_compute_facts | ansible.builtin.combine(oci_object_storage_facts) }}"
+    verbosity: 1
+
+- name: Fetch any assigned secrets' value
+  oracle.oci.oci_secrets_secret_bundle_facts:
+    auth_type: instance_principal
+    secret_id: "{{ item.id }}"
+  loop: '{{ oracle_metadata_instance.definedTags["K3s-ClusterSecrets"] | dict2items(key_name="secret", value_name="id") }}'
+  register: k3s_clustersecrets
+
+- name: "[DEBUG] Print the secrets variable"
+  no_log: true
+  ansible.builtin.debug:
+    msg: "{{ k3s_clustersecrets }}"
+    verbosity: 2
+# - name: Get the certificate for the Object Storage namespace endpoint
+#   community.crypto.get_certificate:
+#     host: "{{ item }}"
+#     port: 443
+#   run_once: true
+#   register: oci_object_storage_cert
+#   loop:
+#     - "{{ oci_object_storage_facts.namespace }}.compat.objectstorage.{{ oracle_metadata_instance.region }}.oraclecloud.com"
+
+# - name: "[DEBUG] Show the certificate for the Object Storage namespace endpoint"
+#   ansible.builtin.debug:
+#     msg: "{{ oci_object_storage_cert }}"
+#     verbosity: 2

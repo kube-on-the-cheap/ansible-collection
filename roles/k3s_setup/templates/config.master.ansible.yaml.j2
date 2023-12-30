@@ -1,0 +1,23 @@
+etcd-expose-metrics: "true"
+flannel-backend: "none"
+disable-cloud-controller: "true"
+write-kubeconfig-mode: "0644"
+write-kubeconfig: {{ k3s_kubeconfig }}
+cluster-cidr: {{ k3s_cluster_cidr }}
+service-cidr: {{ k3s_service_cidr }}
+disable-network-policy: "true"
+disable:
+  - traefik
+  - servicelb
+advertise-address: {{ oci_compute_facts.instances | map(attribute="primary_public_ip") | first }}
+etcd-s3-endpoint: "https://{{ oci_object_storage_facts.namespace }}.compat.objectstorage.{{ oracle_metadata_instance.region }}.oraclecloud.com"
+etcd-snapshot-schedule-cron: '0 0 * * *'
+etcd-snapshot-retention: 14
+etcd-s3: true
+etcd-s3-endpoint-ca: "b64ca"
+etcd-s3-skip-ssl-verify: true
+etcd-s3-region: "{{ oracle_metadata_instance.canonicalRegionName | lower }}"
+etcd-s3-folder: "etcd"
+{% for result in k3s_clustersecrets.results %}
+{{ result.item.secret }}: {{ result.secret_bundle.secret_bundle_content.content | b64decode }}
+{% endfor %}

@@ -1,0 +1,75 @@
+name: Semantic checks
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+    paths-ignore:
+      - .github/**
+      - docs/**
+      - "*"
+jobs:
+  # TODO: add
+  # check we have at least a changelog fragment
+  fetch-tag-info:
+    runs-on: ubuntu-latest
+    outputs:
+      next_tag: ${{ steps.next_collection_version.outputs.new_tag }}
+      configured_tag: ${{ steps.configured_collection_version.outputs.result }}
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+      - name: Check next tag to be generated
+        id: next_collection_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: true
+      - name: Fetch current collection version
+        id: configured_collection_version
+        uses: mikefarah/yq@v4.33.3
+        with:
+          cmd: yq '.version' 'galaxy.yml'
+  verify-tag-collision:
+    runs-on: ubuntu-latest
+    needs: [fetch-tag-info]
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+      - name: Check there's no collisions on next tag
+        env:
+          TAG_NEXT: ${{ needs.fetch-tag-info.outputs.next_tag }}
+        run: |
+          git fetch --all --tags >/dev/null 2>&1
+          if [ $(git tag --list $TAG_NEXT ) ]; then
+            echo "::warning ::Next tag value $TAG_NEXT"
+            echo "::error ::Next tag already exists in git"
+            exit 1
+          else
+            echo "::notice ::Next tag is not present in git, proceeding."
+            exit 0
+          fi
+  verify-tag-config:
+    runs-on: ubuntu-latest
+    needs: [fetch-tag-info]
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+      - name: Check that next tag is configured in the Ansible Collection
+        env:
+          TAG_NEXT: ${{ needs.fetch-tag-info.outputs.next_tag }}
+          TAG_CONFIGURED: ${{ needs.fetch-tag-info.outputs.configured_tag }}
+        run: |
+          if [ "$TAG_NEXT" == "v$TAG_CONFIGURED" ]; then
+            echo "::notice ::Next tag is configured in the Ansible Collection"
+            exit 0
+          else
+            echo "::warning ::Configured tag value is $TAG_CONFIGURED"
+            echo "::warning ::Next tag value is $TAG_NEXT"
+            echo "::error ::Next tag is not configured in the Ansible Collection"
+            exit 1
+          fi

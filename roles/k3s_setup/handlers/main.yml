@@ -1,0 +1,11 @@
+---
+# handlers file for k3s_init
+- name: Systemd reload
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Verify system setup
+  changed_when: false
+  ansible.builtin.command:
+    cmd: /usr/local/bin/k3s check-config

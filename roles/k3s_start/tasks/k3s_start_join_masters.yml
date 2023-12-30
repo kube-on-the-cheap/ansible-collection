@@ -1,0 +1,68 @@
+- name: Enable and start K3s systemd unit
+  ansible.builtin.systemd:
+    state: started
+    name: k3s
+    enabled: true
+
+- name: Check we're bootstrapped
+  block:
+    - name: Wait until the API Server is up and running
+      ansible.builtin.wait_for:
+        port: 6443
+        delay: 10
+
+    - name: Wait until we have a kubeconfig
+      ansible.builtin.wait_for:
+        path: "{{ k3s_kubeconfig }}"
+        state: present
+
+    - name: Run a kubectl command...
+      changed_when: false
+      environment:
+        KUBECONFIG: "{{ k3s_kubeconfig }}"
+      ansible.builtin.shell: k3s kubectl get nodes --output json
+      register: k3s_kubectl
+
+    - name: "[DEBUG] Show the kubectl output"
+      ansible.builtin.debug:
+        msg: "{{ k3s_kubectl.stdout | ansible.builtin.from_json }}"
+        verbosity: 2
+
+    - name: ...and verify the we have our master node
+      ansible.builtin.assert:
+        that:
+          - "ansible_facts.hostname in (k3s_kubectl.stdout | ansible.builtin.from_json)['items'] |  map(attribute='metadata') | map(attribute='name')"
+        fail_msg: "'kubectl get nodes' doesn't contain the node hostname"
+        success_msg: "'kubectl get nodes' contains the node hostname"
+  rescue:
+    - name: "[META] [MASTER] Set the NodeInitStatus as failed"
+      oracle.oci.oci_compute_instance:
+        instance_id: "{{ oracle_metadata_instance.id }}"
+        auth_type: instance_principal
+        defined_tags: "{{ oracle_metadata_instance.definedTags | ansible.builtin.combine({'K3s-NodeInfo': {'NodeInitStatus': 'failed'}}, recursive=true) }}"
+        # WARN: Please please please leave this, otherwise this will try to poll a work_request with a lot more permissions needed
+        wait: false
+
+- name: Upload the updated kubeconfig to the Config Bucket
+  block:
+    - name: Copy kubeconfig to the parsed one
+      ansible.builtin.copy:
+        dest: "{{ k3s_kubeconfig }}-global"
+        src: "{{ k3s_kubeconfig }}"
+        mode: "0644"
+        remote_src: true
+
+    - name: Edit the config
+      ansible.builtin.replace:
+        path: "{{ k3s_kubeconfig }}-global"
+        regexp: '(127\.0\.0\.1)'
+        replace: '{{ apiserver_lb_hostname }}'
+
+    - name: Upload the complete config
+      oracle.oci.oci_object_storage_object:
+        namespace_name: "{{ oci_object_storage_facts.namespace }}"
+        bucket_name: "{{ k3s_bucket_kubeconfig }}"
+        object_name: kubeconfig
+        src: "{{ k3s_kubeconfig }}-global"
+        force: true
+        auth_type: instance_principal
