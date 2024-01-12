@@ -34,6 +34,14 @@
           - "ansible_facts.hostname in (k3s_kubectl.stdout | ansible.builtin.from_json)['items'] |  map(attribute='metadata') | map(attribute='name')"
         fail_msg: "'kubectl get nodes' doesn't contain the node hostname"
         success_msg: "'kubectl get nodes' contains the node hostname"
+
+    - name: Install Cilium
+      ansible.builtin.shell: cilium install 
+      environment:
+        KUBECONFIG: "{{ k3s_kubeconfig }}"
+      notify:
+      - Check Cilium install
+
   rescue:
     - name: "[META] [MASTER] Set the NodeInitStatus as failed"
       oracle.oci.oci_compute_instance:

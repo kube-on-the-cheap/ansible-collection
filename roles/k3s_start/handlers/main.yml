@@ -1,2 +1,13 @@
 ---
 # handlers file for k3s_bootstrap
+- name: Check Cilium install
+  block:
+  - name: Validate Cilium has been installed
+    environment:
+        KUBECONFIG: "{{ k3s_kubeconfig }}"
+    ansible.builtin.shell: cilium status --wait
+
+  - name: Validate Cilium connectivity
+    environment:
+        KUBECONFIG: "{{ k3s_kubeconfig }}"
+    ansible.builtin.shell: cilium connectivity test

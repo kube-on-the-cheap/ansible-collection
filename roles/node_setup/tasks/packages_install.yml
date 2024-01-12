@@ -4,3 +4,40 @@
     name: oci-cli
   notify:
     - Check OCI cli
+
+- name: Install Cilium CLI
+  block:
+  - name: "Fetch latest Cilium CLI stable version"
+    ansible.builtin.uri:
+      url: "https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt"
+      return_content: true
+    register: cilium_cli_version
+
+  - name: "[DEBUG] Show the latest Cilium CLI stable version"
+    ansible.builtin.debug:
+      msg: "{{ cilium_cli_version }}"
+      verbosity: 3
+
+  - name: "[DEBUG] Show the ansible architecture"
+    ansible.builtin.debug:
+      msg: "{{ ansible_architecture }}"
+      verbosity: 3
+
+  - name: Download Cilium CLI archive
+    ansible.builtin.get_url:
+      url: https://github.com/cilium/cilium-cli/releases/download/{{ cilium_cli_version.content | trim }}/cilium-linux-{{ ansible_architectures_mapping[ansible_architecture] }}.tar.gz
+      mode: "0755"
+      owner: root
+      group: root
+      dest: /tmp
+      checksum: sha256:https://github.com/cilium/cilium-cli/releases/download/{{ cilium_cli_version.content | trim }}/cilium-linux-{{ ansible_architectures_mapping[ansible_architecture] }}.tar.gz.sha256sum
+    register: download_cilium_cli
+
+  - name: Extract Cilium CLI archive
+    ansible.builtin.unarchive:
+      src: "/tmp/cilium-linux-{{ ansible_architectures_mapping[ansible_architecture] }}.tar.gz"
+      dest: "/usr/local/bin/"
+      remote_src: True
+    when: download_cilium_cli.changed
+    notify:
+      - Check Cilium CLI

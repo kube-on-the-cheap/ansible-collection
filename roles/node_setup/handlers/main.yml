@@ -11,3 +11,6 @@
 - name: Check OCI cli
   ansible.builtin.include_tasks:
     file: "{{ role_path }}/handlers/oci_cli.yml"
+
+- name: Check Cilium CLI
+  ansible.builtin.command: cilium version --client
